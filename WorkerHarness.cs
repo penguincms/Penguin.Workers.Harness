@@ -2,6 +2,7 @@
 using Penguin.Configuration.Abstractions;
 using Penguin.DependencyInjection;
 using Penguin.DependencyInjection.ServiceProviders;
+using Penguin.DependencyInjection.ServiceScopes;
 using Penguin.Messaging.Core;
 using Penguin.Messaging.Logging.Extensions;
 using Penguin.Messaging.Logging.Messages;
@@ -97,17 +98,12 @@ namespace Penguin.Workers.Harness
         /// <summary>
         /// The time the worker harness was created
         /// </summary>
-        public virtual DateTime start => DateTime.Now;
+        public virtual DateTime Start => DateTime.Now;
 
         /// <summary>
         /// The Directory the log information should be stored in
         /// </summary>
         public virtual DirectoryInfo LogDirectory { get; set; }
-
-        /// <summary>
-        /// The dependency injector used by the harness
-        /// </summary>
-        public virtual Engine ServiceProvider { get; set; }
 
         /// <summary>
         /// The message bus used to push worker messages
@@ -155,7 +151,7 @@ namespace Penguin.Workers.Harness
         private static bool? _console_present;
 
 
-        internal static bool console_present
+        internal static bool Console_present
         {
             get
             {
@@ -174,7 +170,7 @@ namespace Penguin.Workers.Harness
         {
             string toLog = $"{log.Level}: {log.Message}";
 
-            if (console_present)
+            if (Console_present)
             {
                 Console.WriteLine(toLog);
             }
@@ -185,7 +181,7 @@ namespace Penguin.Workers.Harness
 
             lock (logLock)
             {
-                File.AppendAllText(Path.Combine(LogDirectory.FullName, $"Log_{start.ToString("yyyyMMdd_HHmmss")}.txt"), toLog + System.Environment.NewLine);
+                File.AppendAllText(Path.Combine(LogDirectory.FullName, $"Log_{Start.ToString("yyyyMMdd_HHmmss")}.txt"), toLog + System.Environment.NewLine);
             }
         }
 
@@ -297,23 +293,25 @@ namespace Penguin.Workers.Harness
         public int RunWorker(string TypeFullName, Dictionary<string, Type> TypeMapping = null)
         {
 
-            ServiceProvider = new Engine();
-
-            MessageBus = new MessageBus(ServiceProvider);
-
-            if (!Engine.IsRegistered<IServiceProvider>())
+            using (ScopedServiceScope serviceScope = new ScopedServiceScope())
             {
-                Engine.RegisterInstance<IServiceProvider>(ServiceProvider, typeof(ScopedServiceProvider));
+
+                MessageBus = new MessageBus(serviceScope.ServiceProvider);
+
+                if (!Engine.IsRegistered<IServiceProvider>())
+                {
+                    Engine.RegisterInstance<IServiceProvider>(serviceScope.ServiceProvider, typeof(ScopedServiceProvider));
+                }
+
+                Engine.RegisterInstance<IProvideConfigurations>(new ConfigurationProviderList(this.Configs));
+
+                Setup();
+
+                return Execute(TypeFullName, serviceScope.ServiceProvider, TypeMapping);
             }
-
-            Engine.RegisterInstance<IProvideConfigurations>(new ConfigurationProviderList(this.Configs));
-
-            Setup();
-
-            return Execute(TypeFullName, TypeMapping);
         }
 
-        private int Execute(string TypeFullName, Dictionary<string, Type> TypeMapping = null)
+        private int Execute(string TypeFullName, IServiceProvider serviceProvider, Dictionary<string, Type> TypeMapping = null)
         {
             try
             {
@@ -336,7 +334,7 @@ namespace Penguin.Workers.Harness
                 {
                     Engine.Register(toInstantiate, toInstantiate, typeof(TransientServiceProvider));
 
-                        IWorker thisWorker = ServiceProvider.GetService(toInstantiate) as IWorker;
+                        IWorker thisWorker = serviceProvider.GetService(toInstantiate) as IWorker;
 
                         thisWorker.UpdateSync(true);
 
