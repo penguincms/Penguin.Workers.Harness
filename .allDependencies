@@ -1,0 +1,14 @@
+Penguin.Configuration
+Penguin.Configuration.Abstractions
+Penguin.Extensions.String
+Penguin.DependencyInjection
+Penguin.DependencyInjection.Abstractions
+Penguin.Reflection
+Penguin.Debugging
+Penguin.Extensions.Exceptions
+Penguin.Reflection.Abstractions
+Penguin.Reflection.Extensions
+Penguin.Messaging.Logging
+Penguin.Messaging.Abstractions
+Penguin.Messaging.Core
+Penguin.Workers.Abstractions
