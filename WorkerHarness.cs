@@ -1,5 +1,7 @@
 ﻿using Penguin.Configuration;
 using Penguin.Configuration.Abstractions;
+using Penguin.Configuration.Abstractions.Interfaces;
+using Penguin.Configuration.Providers;
 using Penguin.DependencyInjection;
 using Penguin.DependencyInjection.ServiceProviders;
 using Penguin.DependencyInjection.ServiceScopes;
@@ -22,85 +24,6 @@ namespace Penguin.Workers.Harness
     public class WorkerHarness
     {
         /// <summary>
-        /// The configuration providers to be passed to worker instances
-        /// </summary>
-        protected IProvideConfigurations[] Configs { get; set; }
-
-        /// <summary>
-        /// Constructs a new instance of the worker harness
-        /// </summary>
-        /// <param name="configs">A list of configuration providers to pass to the worker instances</param>
-        public WorkerHarness(params IProvideConfigurations[] configs)
-        {
-            Configs = configs;
-        }
-
-        /// <summary>
-        /// Generates scripts for launching individual workers to the build directory in the scripts folder
-        /// </summary>
-        public void GenerateScripts()
-        {
-            foreach(Type t in TypeFactory.GetAllImplementations(typeof(IWorker))) {
-                List<string> scriptLines = new List<string>() {
-                "cd ..",
-                $"IF EXIST {Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)}.exe (",
-                $"{Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)}.exe " + t.FullName,
-                $") ELSE (",
-                $"dotnet {Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)}.dll " + t.FullName,
-                ")"
-                };
-
-                List<string> manualScriptLines = new List<string>() {
-                "@echo off",
-                "",
-                ":: BatchGotAdmin",
-                ":-------------------------------------",
-                "REM  --> Check for permissions",
-                "    IF \"%PROCESSOR_ARCHITECTURE%\" EQU \"amd64\" (",
-                ">nul 2>&1 \"%SYSTEMROOT%\\SysWOW64\\cacls.exe\" \"%SYSTEMROOT%\\SysWOW64\\config\\system\"",
-                ") ELSE (",
-                ">nul 2>&1 \"%SYSTEMROOT%\\system32\\cacls.exe\" \"%SYSTEMROOT%\\system32\\config\\system\"",
-                ")",
-                "",
-                "REM --> If error flag set, we do not have admin.",
-                "if '%errorlevel%' NEQ '0' (",
-                "    echo Requesting administrative privileges...",
-                "    goto UACPrompt",
-                ") else ( goto gotAdmin )",
-                "",
-                ":UACPrompt",
-                "    echo Set UAC = CreateObject^(\"Shell.Application\"^) > \"%temp%\\getadmin.vbs\"",
-                "    set params= %*",
-                "    echo UAC.ShellExecute \"cmd.exe\", \"/c \"\"%~s0\"\" %params:\"=\"\"%\", \"\", \"runas\", 1 >> \"%temp%\\getadmin.vbs\"",
-                "",
-                "    \"%temp%\\getadmin.vbs\"",
-                "    del \"%temp%\\getadmin.vbs\"",
-                "    exit /B",
-                "",
-                ":gotAdmin",
-                "    pushd \"%CD%\"",
-                "    CD /D \"%~dp0\"",
-                ":-------------------------------------- "
-                };
-
-                manualScriptLines.AddRange(scriptLines);
-
-                manualScriptLines.Add("pause");
-
-                File.WriteAllLines(Path.Combine(ScriptsFolder.FullName, t.Name + ".bat"), scriptLines);
-                File.WriteAllLines(Path.Combine(ScriptsFolder.FullName, t.Name + ".Manual.bat"), manualScriptLines);
-
-            }
-
-
-        }
-
-        /// <summary>
-        /// The time the worker harness was created
-        /// </summary>
-        public virtual DateTime Start => DateTime.Now;
-
-        /// <summary>
         /// The Directory the log information should be stored in
         /// </summary>
         public virtual DirectoryInfo LogDirectory { get; set; }
@@ -109,6 +32,24 @@ namespace Penguin.Workers.Harness
         /// The message bus used to push worker messages
         /// </summary>
         public virtual MessageBus MessageBus { get; set; }
+
+        /// <summary>
+        /// The root directory to be treated as the application execution directory
+        /// </summary>
+        public virtual DirectoryInfo RunFolder
+        {
+            get
+            {
+                DirectoryInfo thisDir = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory()));
+
+                if (!thisDir.Exists)
+                {
+                    thisDir.Create();
+                }
+
+                return thisDir;
+            }
+        }
 
         /// <summary>
         /// The folder to generate scripts to for launching workers
@@ -129,27 +70,9 @@ namespace Penguin.Workers.Harness
         }
 
         /// <summary>
-        /// The root directory to be treated as the application execution directory
+        /// The time the worker harness was created
         /// </summary>
-        public virtual DirectoryInfo RunFolder
-        {
-            get
-            {
-                DirectoryInfo thisDir = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory()));
-
-                if (!thisDir.Exists)
-                {
-                    thisDir.Create();
-                }
-
-                return thisDir;
-            }
-        }
-
-        private static readonly object logLock = new object();
-
-        private static bool? _console_present;
-
+        public virtual DateTime Start => DateTime.Now;
 
         internal static bool Console_present
         {
@@ -166,35 +89,22 @@ namespace Penguin.Workers.Harness
             }
         }
 
-        internal void LogError(LogMessage log)
+        /// <summary>
+        /// The configuration providers to be passed to worker instances
+        /// </summary>
+        protected IProvideConfigurations[] Configs { get; set; }
+
+        private static readonly object logLock = new object();
+
+        private static bool? _console_present;
+
+        /// <summary>
+        /// Constructs a new instance of the worker harness
+        /// </summary>
+        /// <param name="configs">A list of configuration providers to pass to the worker instances</param>
+        public WorkerHarness(params IProvideConfigurations[] configs)
         {
-            string toLog = $"{log.Level}: {log.Message}";
-
-            if (Console_present)
-            {
-                Console.WriteLine(toLog);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine(toLog);
-            }
-
-            lock (logLock)
-            {
-                File.AppendAllText(Path.Combine(LogDirectory.FullName, $"Log_{Start.ToString("yyyyMMdd_HHmmss")}.txt"), toLog + System.Environment.NewLine);
-            }
-        }
-
-        private void Setup()
-        {
-            MessageBus.Subscribe((LogMessage log) => { LogError(log); });
-
-            LogDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
-
-            if (!LogDirectory.Exists)
-            {
-                LogDirectory.Create();
-            }
+            Configs = configs;
         }
 
         /// <summary>
@@ -285,6 +195,64 @@ namespace Penguin.Workers.Harness
         }
 
         /// <summary>
+        /// Generates scripts for launching individual workers to the build directory in the scripts folder
+        /// </summary>
+        public void GenerateScripts()
+        {
+            foreach (Type t in TypeFactory.GetAllImplementations(typeof(IWorker)))
+            {
+                List<string> scriptLines = new List<string>() {
+                "cd ..",
+                $"IF EXIST {Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)}.exe (",
+                $"{Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)}.exe " + t.FullName,
+                $") ELSE (",
+                $"dotnet {Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)}.dll " + t.FullName,
+                ")"
+                };
+
+                List<string> manualScriptLines = new List<string>() {
+                "@echo off",
+                "",
+                ":: BatchGotAdmin",
+                ":-------------------------------------",
+                "REM  --> Check for permissions",
+                "    IF \"%PROCESSOR_ARCHITECTURE%\" EQU \"amd64\" (",
+                ">nul 2>&1 \"%SYSTEMROOT%\\SysWOW64\\cacls.exe\" \"%SYSTEMROOT%\\SysWOW64\\config\\system\"",
+                ") ELSE (",
+                ">nul 2>&1 \"%SYSTEMROOT%\\system32\\cacls.exe\" \"%SYSTEMROOT%\\system32\\config\\system\"",
+                ")",
+                "",
+                "REM --> If error flag set, we do not have admin.",
+                "if '%errorlevel%' NEQ '0' (",
+                "    echo Requesting administrative privileges...",
+                "    goto UACPrompt",
+                ") else ( goto gotAdmin )",
+                "",
+                ":UACPrompt",
+                "    echo Set UAC = CreateObject^(\"Shell.Application\"^) > \"%temp%\\getadmin.vbs\"",
+                "    set params= %*",
+                "    echo UAC.ShellExecute \"cmd.exe\", \"/c \"\"%~s0\"\" %params:\"=\"\"%\", \"\", \"runas\", 1 >> \"%temp%\\getadmin.vbs\"",
+                "",
+                "    \"%temp%\\getadmin.vbs\"",
+                "    del \"%temp%\\getadmin.vbs\"",
+                "    exit /B",
+                "",
+                ":gotAdmin",
+                "    pushd \"%CD%\"",
+                "    CD /D \"%~dp0\"",
+                ":-------------------------------------- "
+                };
+
+                manualScriptLines.AddRange(scriptLines);
+
+                manualScriptLines.Add("pause");
+
+                File.WriteAllLines(Path.Combine(ScriptsFolder.FullName, t.Name + ".bat"), scriptLines);
+                File.WriteAllLines(Path.Combine(ScriptsFolder.FullName, t.Name + ".Manual.bat"), manualScriptLines);
+            }
+        }
+
+        /// <summary>
         /// Kicks off a worker by the type name
         /// </summary>
         /// <param name="TypeFullName">The name of the worker to kick off</param>
@@ -292,10 +260,8 @@ namespace Penguin.Workers.Harness
         /// <returns>A result code from the worker</returns>
         public int RunWorker(string TypeFullName, Dictionary<string, Type> TypeMapping = null)
         {
-
             using (ScopedServiceScope serviceScope = new ScopedServiceScope())
             {
-
                 MessageBus = new MessageBus(serviceScope.ServiceProvider);
 
                 if (!Engine.IsRegistered<IServiceProvider>())
@@ -311,21 +277,41 @@ namespace Penguin.Workers.Harness
             }
         }
 
+        internal void LogError(LogMessage log)
+        {
+            string toLog = $"{log.Level}: {log.Message}";
+
+            if (Console_present)
+            {
+                Console.WriteLine(toLog);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine(toLog);
+            }
+
+            lock (logLock)
+            {
+                File.AppendAllText(Path.Combine(LogDirectory.FullName, $"Log_{Start.ToString("yyyyMMdd_HHmmss")}.txt"), toLog + System.Environment.NewLine);
+            }
+        }
+
         private int Execute(string TypeFullName, IServiceProvider serviceProvider, Dictionary<string, Type> TypeMapping = null)
         {
             try
             {
                 Type toInstantiate = null;
 
-                if(TypeMapping != null && TypeMapping.ContainsKey(TypeFullName))
+                if (TypeMapping != null && TypeMapping.ContainsKey(TypeFullName))
                 {
                     toInstantiate = TypeMapping[TypeFullName];
-                } else
+                }
+                else
                 {
                     toInstantiate = TypeFactory.GetTypeByFullName(TypeFullName);
                 }
 
-                if(toInstantiate is null)
+                if (toInstantiate is null)
                 {
                     throw new ArgumentNullException($"Could not find type {TypeFullName} in optional mapping dictionary or using reflection over local dll's");
                 }
@@ -334,10 +320,9 @@ namespace Penguin.Workers.Harness
                 {
                     Engine.Register(toInstantiate, toInstantiate, typeof(TransientServiceProvider));
 
-                        IWorker thisWorker = serviceProvider.GetService(toInstantiate) as IWorker;
+                    IWorker thisWorker = serviceProvider.GetService(toInstantiate) as IWorker;
 
-                        thisWorker.UpdateSync(true);
-
+                    thisWorker.UpdateSync(true);
                 }
             }
             catch (Exception ex)
@@ -350,6 +335,18 @@ namespace Penguin.Workers.Harness
             {
             }
             return 0;
+        }
+
+        private void Setup()
+        {
+            MessageBus.Subscribe((LogMessage log) => { LogError(log); });
+
+            LogDirectory = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+
+            if (!LogDirectory.Exists)
+            {
+                LogDirectory.Create();
+            }
         }
     }
 }

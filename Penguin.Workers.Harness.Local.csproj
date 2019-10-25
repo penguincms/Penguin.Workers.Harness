@@ -7,31 +7,19 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
-    <ProjectReference Include="..\Penguin.Configuration\Penguin.Configuration.csproj" />
-    <ProjectReference Include="..\Penguin.Configuration.Abstractions\Penguin.Configuration.Abstractions.csproj" />
-    <ProjectReference Include="..\Penguin.Extensions.String\Penguin.Extensions.String.csproj" />
-    <ProjectReference Include="..\Penguin.DependencyInjection\Penguin.DependencyInjection.csproj" />
-    <ProjectReference Include="..\Penguin.DependencyInjection.Abstractions\Penguin.DependencyInjection.Abstractions.csproj" />
-    <ProjectReference Include="..\Penguin.Reflection\Penguin.Reflection.csproj" />
-    <ProjectReference Include="..\Penguin.Debugging\Penguin.Debugging.csproj" />
-    <ProjectReference Include="..\Penguin.Extensions.Exceptions\Penguin.Extensions.Exceptions.csproj" />
-    <ProjectReference Include="..\Penguin.Reflection.Abstractions\Penguin.Reflection.Abstractions.csproj" />
-    <ProjectReference Include="..\Penguin.Reflection.Extensions\Penguin.Reflection.Extensions.csproj" />
-    <ProjectReference Include="..\Penguin.Extensions.String\Penguin.Extensions.String.csproj" />
-    <ProjectReference Include="..\Penguin.Reflection.Abstractions\Penguin.Reflection.Abstractions.csproj" />
-    <ProjectReference Include="..\Penguin.Messaging.Logging\Penguin.Messaging.Logging.csproj" />
-    <ProjectReference Include="..\Penguin.Messaging.Abstractions\Penguin.Messaging.Abstractions.csproj" />
-    <ProjectReference Include="..\Penguin.Messaging.Core\Penguin.Messaging.Core.csproj" />
-    <ProjectReference Include="..\Penguin.Debugging\Penguin.Debugging.csproj" />
-    <ProjectReference Include="..\Penguin.Extensions.Exceptions\Penguin.Extensions.Exceptions.csproj" />
-    <ProjectReference Include="..\Penguin.Messaging.Abstractions\Penguin.Messaging.Abstractions.csproj" />
-    <ProjectReference Include="..\Penguin.Reflection\Penguin.Reflection.csproj" />
-    <ProjectReference Include="..\Penguin.Debugging\Penguin.Debugging.csproj" />
-    <ProjectReference Include="..\Penguin.Extensions.Exceptions\Penguin.Extensions.Exceptions.csproj" />
-    <ProjectReference Include="..\Penguin.Reflection.Abstractions\Penguin.Reflection.Abstractions.csproj" />
-    <ProjectReference Include="..\Penguin.Workers.Abstractions\Penguin.Workers.Abstractions.csproj" />
+    <ProjectReference Include="..\Penguin.Configuration\Penguin.Configuration.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Configuration.Abstractions\Penguin.Configuration.Abstractions.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Extensions.String\Penguin.Extensions.String.Local.csproj" />
+    <ProjectReference Include="..\Penguin.DependencyInjection\Penguin.DependencyInjection.Local.csproj" />
+    <ProjectReference Include="..\Penguin.DependencyInjection.Abstractions\Penguin.DependencyInjection.Abstractions.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Reflection\Penguin.Reflection.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Debugging\Penguin.Debugging.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Extensions.Exceptions\Penguin.Extensions.Exceptions.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Reflection.Abstractions\Penguin.Reflection.Abstractions.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Reflection.Extensions\Penguin.Reflection.Extensions.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Messaging.Logging\Penguin.Messaging.Logging.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Messaging.Abstractions\Penguin.Messaging.Abstractions.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Messaging.Core\Penguin.Messaging.Core.Local.csproj" />
+    <ProjectReference Include="..\Penguin.Workers.Abstractions\Penguin.Workers.Abstractions.Local.csproj" />
   </ItemGroup>
 </Project>
