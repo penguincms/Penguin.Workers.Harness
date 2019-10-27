@@ -7,10 +7,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Penguin.DependencyInjection" Version="4.1.10" />
-    <PackageReference Include="Penguin.Messaging.Logging" Version="3.0.0" />
-    <PackageReference Include="Penguin.Reflection" Version="4.0.8" />
-    <PackageReference Include="Penguin.Workers.Abstractions" Version="2.0.0" />
-    <PackageReference Include="Penguin.Configuration" Version="2.0.1-63707652289" />
+    <PackageReference Include="Penguin.Messaging.Logging" Version="3.0.0-T9LXGUJ" />
+    <PackageReference Include="Penguin.Workers.Abstractions" Version="2.0.0-T9LXGUJ" />
+    <PackageReference Include="Penguin.Configuration" Version="2.0.1-T9LXGUJ" />
+    <PackageReference Include="Penguin.DependencyInjection" Version="4.1.10-T9LXGUJ" />
   </ItemGroup>
 </Project>
