@@ -258,7 +258,7 @@ namespace Penguin.Workers.Harness
         /// <param name="TypeFullName">The name of the worker to kick off</param>
         /// <param name="TypeMapping">An optional TypeName/Type dictionary used for mapping and optionally ensuring that the referenced DLL's deploy with the application</param>
         /// <returns>A result code from the worker</returns>
-        public int RunWorker(string TypeFullName, Dictionary<string, Type> TypeMapping = null)
+        public int RunWorker(string TypeFullName, Dictionary<string, Type> TypeMapping = null, params string[] args)
         {
             using (ScopedServiceScope serviceScope = new ScopedServiceScope())
             {
@@ -273,7 +273,7 @@ namespace Penguin.Workers.Harness
 
                 Setup();
 
-                return Execute(TypeFullName, serviceScope.ServiceProvider, TypeMapping);
+                return Execute(TypeFullName, serviceScope.ServiceProvider, TypeMapping, args);
             }
         }
 
@@ -296,7 +296,7 @@ namespace Penguin.Workers.Harness
             }
         }
 
-        private int Execute(string TypeFullName, IServiceProvider serviceProvider, Dictionary<string, Type> TypeMapping = null)
+        private int Execute(string TypeFullName, IServiceProvider serviceProvider, Dictionary<string, Type> TypeMapping = null, params string[] args)
         {
             try
             {
@@ -322,7 +322,7 @@ namespace Penguin.Workers.Harness
 
                     IWorker thisWorker = serviceProvider.GetService(toInstantiate) as IWorker;
 
-                    thisWorker.UpdateSync(true);
+                    thisWorker.UpdateSync(true, args);
                 }
             }
             catch (Exception ex)

@@ -10,8 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Penguin.Messaging.Logging" Version="3.0.1-T9MJL4F" />
-    <PackageReference Include="Penguin.Workers.Abstractions" Version="2.0.1-T9MJL4F" />
     <PackageReference Include="Penguin.Configuration" Version="2.0.2-T9MJL4F" />
     <PackageReference Include="Penguin.DependencyInjection" Version="4.1.11-T9MJL4F" />
+    <PackageReference Include="Penguin.Workers.Abstractions" Version="2.0.1-T9MPE3A" />
   </ItemGroup>
 </Project>
