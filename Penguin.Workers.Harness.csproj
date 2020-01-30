@@ -7,6 +7,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Penguin.Workers.Harness</AssemblyName>
     <RootNamespace>Penguin.Workers.Harness</RootNamespace>
+    <DocumentationFile>Penguin.Workers.Harness.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Penguin.Messaging.Logging" Version="3.0.1-T9QC72V" />
