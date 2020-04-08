@@ -13,6 +13,6 @@
     <PackageReference Include="Penguin.Messaging.Logging" Version="3.0.1-T9RVMZA" />
     <PackageReference Include="Penguin.Workers.Abstractions" Version="2.0.1-T9RVMZA" />
     <PackageReference Include="Penguin.Configuration" Version="2.0.2-T9SPWN8" />
-    <PackageReference Include="Penguin.DependencyInjection" Version="4.1.11-T9SPWN8" />
+    <PackageReference Include="Penguin.DependencyInjection" Version="4.1.11-T9UEEAT" />
   </ItemGroup>
 </Project>
