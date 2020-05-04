@@ -10,9 +10,9 @@
     <DocumentationFile>Penguin.Workers.Harness.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Penguin.Messaging.Logging" Version="3.0.1-T9UW4G4" />
-    <PackageReference Include="Penguin.Workers.Abstractions" Version="2.0.1-T9UW4G4" />
-    <PackageReference Include="Penguin.Configuration" Version="2.0.2-T9UW4G4" />
-    <PackageReference Include="Penguin.DependencyInjection" Version="4.1.11-T9UW4G4" />
+    <PackageReference Include="Penguin.Messaging.Logging" Version="3.0.1-T9VPJBO" />
+    <PackageReference Include="Penguin.Workers.Abstractions" Version="2.0.1-T9VPJBO" />
+    <PackageReference Include="Penguin.Configuration" Version="2.0.2-T9VPJBO" />
+    <PackageReference Include="Penguin.DependencyInjection" Version="4.1.11-T9VPJBO" />
   </ItemGroup>
 </Project>
