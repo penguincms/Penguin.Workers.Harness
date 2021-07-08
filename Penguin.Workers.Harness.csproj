@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="Penguin.Projects.Shared\Penguin.Projects.Shared.csproj" />
   <PropertyGroup>
-    <PackageProjectUrl>https://github.com/penguincms/Penguin.Workers.Harness</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/PenguinCMS/Penguin.Workers.Harness</PackageProjectUrl>
     <Version>5.0.5</Version>
     <Description>Provides a shared class to be referenced by EXE files used to run implementations of the IWorker class.</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -10,9 +10,9 @@
     <DocumentationFile>Penguin.Workers.Harness.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Penguin.Workers.Abstractions" Version="5.0.4" />
-    <PackageReference Include="Penguin.Messaging.Logging" Version="5.0.4" />
-    <PackageReference Include="Penguin.Configuration" Version="5.0.6-TAEO1KM" />
-    <PackageReference Include="Penguin.DependencyInjection" Version="5.0.6-TAEO1KM" />
+    <PackageReference Include="Penguin.Workers.Abstractions" Version="5.0.6-TAHULSY" />
+    <PackageReference Include="Penguin.Configuration" Version="5.0.6-TAHULSY" />
+    <PackageReference Include="Penguin.Messaging.Logging" Version="5.0.6-TAHULSY" />
+    <PackageReference Include="Penguin.DependencyInjection" Version="5.0.6-TAHULSY" />
   </ItemGroup>
 </Project>
