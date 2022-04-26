@@ -4,15 +4,15 @@
     <PackageProjectUrl>https://github.com/PenguinCMS/Penguin.Workers.Harness</PackageProjectUrl>
     <Version>5.0.5</Version>
     <Description>Provides a shared class to be referenced by EXE files used to run implementations of the IWorker class.</Description>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
     <AssemblyName>Penguin.Workers.Harness</AssemblyName>
     <RootNamespace>Penguin.Workers.Harness</RootNamespace>
     <DocumentationFile>Penguin.Workers.Harness.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Penguin.Workers.Abstractions" Version="5.0.6-TAVV3GD" />
-    <PackageReference Include="Penguin.Configuration" Version="5.0.6-TAVV3GD" />
-    <PackageReference Include="Penguin.Messaging.Logging" Version="5.0.6-TAVV3GD" />
-    <PackageReference Include="Penguin.DependencyInjection" Version="5.0.6-TAVV3GD" />
+    <PackageReference Include="Penguin.Workers.Abstractions" Version="5.0.6-TAW5FE4" />
+    <PackageReference Include="Penguin.Configuration" Version="5.0.6-TAW5FE4" />
+    <PackageReference Include="Penguin.Messaging.Logging" Version="5.0.6-TAW5FE4" />
+    <PackageReference Include="Penguin.DependencyInjection" Version="5.0.6-TAW5FE4" />
   </ItemGroup>
 </Project>
