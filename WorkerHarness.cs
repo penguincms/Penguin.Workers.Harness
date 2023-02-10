@@ -1,6 +1,4 @@
-﻿using Penguin.Configuration;
-using Penguin.Configuration.Abstractions;
-using Penguin.Configuration.Abstractions.Interfaces;
+﻿using Penguin.Configuration.Abstractions.Interfaces;
 using Penguin.Configuration.Providers;
 using Penguin.DependencyInjection;
 using Penguin.DependencyInjection.ServiceProviders;
@@ -40,7 +38,7 @@ namespace Penguin.Workers.Harness
         {
             get
             {
-                DirectoryInfo thisDir = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory()));
+                DirectoryInfo thisDir = new(Path.Combine(Directory.GetCurrentDirectory()));
 
                 if (!thisDir.Exists)
                 {
@@ -58,7 +56,7 @@ namespace Penguin.Workers.Harness
         {
             get
             {
-                DirectoryInfo thisDir = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "Scripts"));
+                DirectoryInfo thisDir = new(Path.Combine(Directory.GetCurrentDirectory(), "Scripts"));
 
                 if (!thisDir.Exists)
                 {
@@ -94,7 +92,7 @@ namespace Penguin.Workers.Harness
         /// </summary>
         protected IProvideConfigurations[] Configs { get; set; }
 
-        private static readonly object logLock = new object();
+        private static readonly object logLock = new();
 
         private static bool? _console_present;
 
@@ -118,7 +116,7 @@ namespace Penguin.Workers.Harness
             string Cleaned = "<!--cleaned-->";
 
             List<string> oldLines = File.ReadAllLines(path).ToList();
-            List<string> newLines = new List<string>();
+            List<string> newLines = new();
 
             if (oldLines.Last() == Cleaned)
             {
@@ -127,7 +125,7 @@ namespace Penguin.Workers.Harness
 
             int SkipDepth = 0;
 
-            List<(string StartTag, string EndTag)> SkipSections = new List<(string StartTag, string EndTag)>()
+            List<(string StartTag, string EndTag)> SkipSections = new()
             {
                 //("<runtime>","</runtime>"),
                 ("<controls>","</controls>"),
@@ -138,14 +136,14 @@ namespace Penguin.Workers.Harness
                 ("<system.codedom>", "</system.codedom>")
             };
 
-            List<string> StripTags = new List<string>()
+            List<string> StripTags = new()
             {
                 "<location",
                 "</location>",
                 "<system.webServer />"
             };
 
-            Dictionary<string, List<string>> InsertSections = new Dictionary<string, List<string>>()
+            Dictionary<string, List<string>> InsertSections = new()
             {
                 ["<configSections>"] = new List<string>()
                 {
@@ -154,7 +152,7 @@ namespace Penguin.Workers.Harness
                 }
             };
 
-            List<string> TagsToName = new List<string>()
+            List<string> TagsToName = new()
             {
                 "add",
                 "remove",
@@ -168,7 +166,7 @@ namespace Penguin.Workers.Harness
                     SkipDepth++;
                 }
 
-                if (SkipDepth == 0 && !StripTags.Any(st => s.Contains(st)))
+                if (SkipDepth == 0 && !StripTags.Any(s.Contains))
                 {
                     {
                         newLines.Add(s);
@@ -201,7 +199,7 @@ namespace Penguin.Workers.Harness
         {
             foreach (Type t in TypeFactory.GetAllImplementations(typeof(IWorker)))
             {
-                List<string> scriptLines = new List<string>() {
+                List<string> scriptLines = new() {
                 "cd ..",
                 $"IF EXIST {Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)}.exe (",
                 $"{Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)}.exe " + t.FullName,
@@ -210,7 +208,7 @@ namespace Penguin.Workers.Harness
                 ")"
                 };
 
-                List<string> manualScriptLines = new List<string>() {
+                List<string> manualScriptLines = new() {
                 "@echo off",
                 "",
                 ":: BatchGotAdmin",
@@ -259,23 +257,22 @@ namespace Penguin.Workers.Harness
         /// <param name="TypeMapping">An optional TypeName/Type dictionary used for mapping and optionally ensuring that the referenced DLL's deploy with the application</param>
         /// <param name="args"></param>
         /// <returns>A result code from the worker</returns>
+        [Obsolete]
         public int RunWorker(string TypeFullName, Dictionary<string, Type> TypeMapping = null, params string[] args)
         {
-            using (ScopedServiceScope serviceScope = new ScopedServiceScope())
+            using ScopedServiceScope serviceScope = new();
+            MessageBus = new MessageBus(serviceScope.ServiceProvider);
+
+            if (!Engine.IsRegistered<IServiceProvider>())
             {
-                MessageBus = new MessageBus(serviceScope.ServiceProvider);
-
-                if (!Engine.IsRegistered<IServiceProvider>())
-                {
-                    Engine.RegisterInstance<IServiceProvider>(serviceScope.ServiceProvider, typeof(ScopedServiceProvider));
-                }
-
-                Engine.RegisterInstance<IProvideConfigurations>(new ConfigurationProviderList(this.Configs));
-
-                Setup();
-
-                return Execute(TypeFullName, serviceScope.ServiceProvider, TypeMapping, args);
+                Engine.RegisterInstance<IServiceProvider>(serviceScope.ServiceProvider, typeof(ScopedServiceProvider));
             }
+
+            Engine.RegisterInstance<IProvideConfigurations>(new ConfigurationProviderList(Configs));
+
+            Setup();
+
+            return Execute(TypeFullName, serviceScope.ServiceProvider, TypeMapping, args);
         }
 
         internal void LogError(LogMessage log)
@@ -293,7 +290,7 @@ namespace Penguin.Workers.Harness
 
             lock (logLock)
             {
-                File.AppendAllText(Path.Combine(LogDirectory.FullName, $"Log_{Start.ToString("yyyyMMdd_HHmmss")}.txt"), toLog + System.Environment.NewLine);
+                File.AppendAllText(Path.Combine(LogDirectory.FullName, $"Log_{Start:yyyyMMdd_HHmmss}.txt"), toLog + System.Environment.NewLine);
             }
         }
 
@@ -301,17 +298,7 @@ namespace Penguin.Workers.Harness
         {
             try
             {
-                Type toInstantiate = null;
-
-                if (TypeMapping != null && TypeMapping.ContainsKey(TypeFullName))
-                {
-                    toInstantiate = TypeMapping[TypeFullName];
-                }
-                else
-                {
-                    toInstantiate = TypeFactory.GetTypeByFullName(TypeFullName);
-                }
-
+                Type toInstantiate = TypeMapping != null && TypeMapping.TryGetValue(TypeFullName, out Type value) ? value : TypeFactory.GetTypeByFullName(TypeFullName);
                 if (toInstantiate is null)
                 {
                     throw new ArgumentNullException($"Could not find type {TypeFullName} in optional mapping dictionary or using reflection over local dll's");
