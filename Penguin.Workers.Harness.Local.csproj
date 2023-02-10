@@ -4,7 +4,7 @@
     <PackageProjectUrl>https://github.com/PenguinCms/Penguin.Workers.Harness</PackageProjectUrl>
     <Version>5.0.5</Version>
     <Description>Provides a shared class to be referenced by EXE files used to run implementations of the IWorker class.</Description>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net7.0</TargetFrameworks>
     <AssemblyName>Penguin.Workers.Harness</AssemblyName>
     <RootNamespace>Penguin.Workers.Harness</RootNamespace>
     <DocumentationFile>Penguin.Workers.Harness.xml</DocumentationFile>

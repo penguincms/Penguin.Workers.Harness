@@ -257,6 +257,7 @@ namespace Penguin.Workers.Harness
         /// </summary>
         /// <param name="TypeFullName">The name of the worker to kick off</param>
         /// <param name="TypeMapping">An optional TypeName/Type dictionary used for mapping and optionally ensuring that the referenced DLL's deploy with the application</param>
+        /// <param name="args"></param>
         /// <returns>A result code from the worker</returns>
         public int RunWorker(string TypeFullName, Dictionary<string, Type> TypeMapping = null, params string[] args)
         {
