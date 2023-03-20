@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="Penguin.Projects.Shared\Penguin.Projects.Shared.csproj" />
   <PropertyGroup>
-    <PackageProjectUrl>https://github.com/PenguinCMS/Penguin.Workers.Harness</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/PenguinCms/Penguin.Workers.Harness</PackageProjectUrl>
     <Version>5.0.5</Version>
     <Description>Provides a shared class to be referenced by EXE files used to run implementations of the IWorker class.</Description>
     <TargetFrameworks>netstandard2.1;net7.0</TargetFrameworks>
