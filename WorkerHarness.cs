@@ -198,7 +198,7 @@ namespace Penguin.Workers.Harness
         /// </summary>
         public void GenerateScripts()
         {
-            foreach (Type t in TypeFactory.GetAllImplementations(typeof(IWorker)))
+            foreach (Type t in TypeFactory.Default.GetAllImplementations(typeof(IWorker)))
             {
                 List<string> scriptLines = new() {
                 "cd ..",
@@ -299,7 +299,7 @@ namespace Penguin.Workers.Harness
         {
             try
             {
-                Type toInstantiate = TypeMapping != null && TypeMapping.TryGetValue(TypeFullName, out Type value) ? value : TypeFactory.GetTypeByFullName(TypeFullName);
+                Type toInstantiate = TypeMapping != null && TypeMapping.TryGetValue(TypeFullName, out Type value) ? value : TypeFactory.Default.GetTypeByFullName(TypeFullName);
                 if (toInstantiate is null)
                 {
                     throw new ArgumentNullException($"Could not find type {TypeFullName} in optional mapping dictionary or using reflection over local dll's");
