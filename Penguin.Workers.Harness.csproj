@@ -11,9 +11,9 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Penguin.Workers.Abstractions" Version="5.7.0" />
-    <PackageReference Include="Penguin.Configuration" Version="5.7.0" />
-    <PackageReference Include="Penguin.Messaging.Logging" Version="5.7.0" />
-    <PackageReference Include="Penguin.DependencyInjection" Version="5.7.0" />
+    <PackageReference Include="Penguin.Workers.Abstractions" Version="5.15.0" />
+    <PackageReference Include="Penguin.Configuration" Version="5.15.0" />
+    <PackageReference Include="Penguin.Messaging.Logging" Version="5.15.0" />
+    <PackageReference Include="Penguin.DependencyInjection" Version="5.15.0" />
   </ItemGroup>
 </Project>
